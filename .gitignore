@@ -1,0 +1,22 @@
+# Swift & Package Manager
+.build/
+.swiftpm/
+DerivedData/
+
+# Binaries & App Bundles
+/Cepaty
+/run_tests
+/MenuBarTraffic
+*.app
+*.dmg
+
+# OS & Editor
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*~
+
+# Project Metadata & Logs
+.codebase-memory/
+*.log
