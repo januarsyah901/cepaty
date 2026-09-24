@@ -6,8 +6,9 @@ APP_DIR="${APP_NAME}.app"
 CONTENTS_DIR="${APP_DIR}/Contents"
 MACOS_DIR="${CONTENTS_DIR}/MacOS"
 RESOURCES_DIR="${CONTENTS_DIR}/Resources"
-SDK_PATH="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
-TARGET="arm64-apple-macosx13.0"
+SDK_PATH="$(xcrun --show-sdk-path)"
+ARCH="$(uname -m)"
+TARGET="${ARCH}-apple-macosx13.0"
 
 echo "=== Membangun binary ${APP_NAME} ==="
 rm -rf "${APP_DIR}"
@@ -66,8 +67,12 @@ codesign --force --deep --sign - "${APP_DIR}"
 echo "=== Membuat DMG Installer ==="
 hdiutil create -volname "${APP_NAME}" -srcfolder "${APP_DIR}" -ov -format UDZO "${APP_NAME}-1.0.0.dmg"
 
-echo "=== Memasang ${APP_NAME}.app ke /Applications ==="
-rm -rf "/Applications/${APP_DIR}"
-cp -R "${APP_DIR}" "/Applications/${APP_DIR}"
-
-echo "Selesai! ${APP_NAME}.app terpasang di /Applications/${APP_DIR}"
+# Install locally only if /Applications is writable and running locally
+if [ -w "/Applications" ] && [ -z "$CI" ]; then
+    echo "=== Memasang ${APP_NAME}.app ke /Applications ==="
+    rm -rf "/Applications/${APP_DIR}"
+    cp -R "${APP_DIR}" "/Applications/${APP_DIR}"
+    echo "Selesai! ${APP_NAME}.app terpasang di /Applications/${APP_DIR}"
+else
+    echo "Selesai! Paket ${APP_NAME}.app dan ${APP_NAME}-1.0.0.dmg siap dipakai."
+fi

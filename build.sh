@@ -1,8 +1,9 @@
 #!/bin/bash
 set -e
 
-SDK_PATH="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
-TARGET="arm64-apple-macosx13.0"
+SDK_PATH="$(xcrun --show-sdk-path)"
+ARCH="$(uname -m)"
+TARGET="${ARCH}-apple-macosx13.0"
 
 if [ "$1" == "test" ]; then
     echo "Building and running unit tests..."

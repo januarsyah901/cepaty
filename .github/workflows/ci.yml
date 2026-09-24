@@ -15,11 +15,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
       - name: Show Swift & macOS Environment
         run: |
           swift --version
           sw_vers
-          xcode-select -p
+          xcrun --show-sdk-path
 
       - name: Run Unit Tests
         run: ./build.sh test
