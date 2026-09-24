@@ -1,36 +1,90 @@
-# Cepaty
+<img width="128px" src="assets/logo.png" alt="Cepaty Logo" />
+
+# [Cepaty](https://github.com/januarsyah901/cepaty)
 
 [![CI](https://github.com/januarsyah901/cepaty/actions/workflows/ci.yml/badge.svg)](https://github.com/januarsyah901/cepaty/actions/workflows/ci.yml)
-[![Platform](https://img.shields.io/badge/Platform-macOS%2013%2B-blue.svg)](https://www.apple.com/macos/)
-[![Swift](https://img.shields.io/badge/Swift-5.8%2B-orange.svg)](https://swift.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/januarsyah901/cepaty)](https://github.com/januarsyah901/cepaty/releases)
+[![Platform](https://img.shields.io/badge/Platform-macOS%2013%2B-007AFF.svg?logo=apple&logoColor=white)](https://www.apple.com/macos/)
+[![Swift](https://img.shields.io/badge/Swift-5.8%2B-F05138.svg?logo=swift&logoColor=white)](https://swift.org)
+[![License](https://img.shields.io/badge/License-MIT-34C759.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/januarsyah901/cepaty?color=AF52DE)](https://github.com/januarsyah901/cepaty/releases)
+[![Sponsor](https://img.shields.io/badge/Sponsor-Saweria-E8971E.svg?logo=coffee&logoColor=white)](https://saweria.co/januarsyah)
 
-**Cepaty** adalah aplikasi menu bar macOS native yang ringan dan efisien untuk memantau kecepatan unduh (download) dan unggah (upload) per aplikasi secara *real-time*.
+Cepaty adalah aplikasi pemantau lalu lintas jaringan yang sangat ringan untuk macOS. Aplikasi ini berdiam di menu bar Anda, menampilkan kecepatan unduh dan unggah secara langsung per aplikasi tanpa membutuhkan akses root maupun ekstensi kernel tambahan.
 
-Aplikasi ini berjalan sebagai *menu bar accessory*, tidak memenuhi Dock, dan tidak membutuhkan akses `sudo`, `root`, maupun modul ekstensi kernel pihak ketiga.
+Cepaty berjalan pada macOS Ventura 13 atau versi lebih baru (Apple Silicon & Intel).
 
----
+<!-- vim-markdown-toc GFM -->
 
-## Fitur Utama
+* [Fitur](#fitur)
+* [Pemasangan](#pemasangan)
+  * [Unduh Installer DMG](#unduh-installer-dmg)
+  * [Kompilasi dari Source](#kompilasi-dari-source)
+* [Cara Penggunaan](#cara-penggunaan)
+* [Arsitektur & Cara Kerja](#arsitektur--cara-kerja)
+  * [Snapshot Diskrit Hemat Daya](#snapshot-diskrit-hemat-daya)
+  * [Pengelompokan Sub-proses](#pengelompokan-sub-proses)
+* [Tanya Jawab (FAQ)](#tanya-jawab-faq)
+  * [Apakah Cepaty membutuhkan izin root atau sudo?](#apakah-cepaty-membutuhkan-izin-root-atau-sudo)
+  * [Mengapa proses Chrome Helper dan Slack Renderer digabung?](#mengapa-proses-chrome-helper-dan-slack-renderer-digabung)
+  * [Bagaimana Cepaty menjaga penggunaan CPU tetap 0.0%?](#bagaimana-cepaty-menjaga-penggunaan-cpu-tetap-00)
+  * [Bagaimana cara menyalakan fitur buka saat login?](#bagaimana-cara-menyalakan-fitur-buka-saat-login)
+* [Pengujian Unit](#pengujian-unit)
+* [Struktur Berkas](#struktur-berkas)
+* [Dukungan (Sponsor)](#dukungan-sponsor)
+* [Lisensi](#lisensi)
 
-- **Live Speed di Menu Bar**: Menampilkan total kecepatan unduh dan unggah secara langsung (`↓ …  ↑ …`) dengan tipografi monospaced agar angka stabil saat berubah.
-- **Rincian Lalu Lintas Per Aplikasi**: Memetakan koneksi jaringan ke aplikasi terkait, lengkap dengan nama proses dan ikon aplikasi bawaan macOS.
-- **Pengelompokan Helper & Renderer**: Proses turunan (seperti Google Chrome Helper atau Slack Renderer) otomatis digabungkan ke aplikasi induknya.
-- **Dua Mode Pengurutan**: Pilihan urutan berdasarkan kecepatan aktif saat ini (**Sekarang**) atau akumulasi penggunaan data selama sesi berjalan (**Total**).
-- **Efisiensi Daya & CPU Ekstrem**: Konsumsi CPU **0.0%** pada kondisi latar belakang (background) dan rata-rata memori hanya ~45 MB.
-- **Buka Saat Login**: Integrasi langsung dengan API resmi macOS `SMAppService`.
-- **Privasi Terjaga**: Berjalan 100% lokal di mesin pengguna, tidak memodifikasi paket jaringan, dan tanpa telemetri luar.
+<!-- vim-markdown-toc -->
 
----
+## Fitur
 
-## Arsitektur Teknis
+* ⚡ **Ringan dan Cepat**: Konsumsi CPU tercatat **0.0%** di latar belakang, memori hanya sekitar ~45 MB.
+* 📊 **Live Speed Monospaced**: Angka download dan upload (`↓ …  ↑ …`) di status bar tidak bergetar saat digit berubah.
+* 🧩 **Per-App Traffic**: Menampilkan daftar aplikasi yang memakai kuota lengkap dengan ikon asli macOS.
+* 🗂️ **Dua Mode Urutan**: Beralih instan antara kecepatan aktif (**Sekarang**) dan total kuota (**Total**).
+* 🛡️ **Aman dan Privat**: Berjalan 100% lokal, tanpa packet filtering, tanpa pengiriman data keluar.
+* 🚀 **Native UI**: Murni dibangun dengan SwiftUI dan AppKit tanpa ketergantungan Electron atau webview.
+* 🔓 **Open Source**: Bebas dipakai dan dikembangkan dengan lisensi terbuka MIT.
 
-Cepaty dirancang dengan fokus pada efisiensi baterai dan akurasi data.
+## Pemasangan
 
+### Unduh Installer DMG
+
+1. Unduh berkas installer terbaru dari halaman [Releases](https://github.com/januarsyah901/cepaty/releases/latest).
+2. Buka berkas `Cepaty-1.0.0.dmg`.
+3. Tarik ikon `Cepaty.app` ke dalam pintasan folder `Applications`.
+4. Buka Cepaty lewat Spotlight atau Launchpad.
+
+### Kompilasi dari Source
+
+Pastikan Xcode Command Line Tools sudah aktif di Mac Anda. Jalankan perintah berikut di terminal:
+
+```sh
+# Clone repositori
+git clone https://github.com/januarsyah901/cepaty.git
+cd cepaty
+
+# Jalankan unit test
+./build.sh test
+
+# Bangun aplikasi dan pasang ke /Applications
+./package_app.sh
 ```
+
+## Cara Penggunaan
+
+1. Klik teks status `↓ 0 B/s  ↑ 0 B/s` pada menu bar kanan atas Mac Anda untuk membuka jendela popover.
+2. Klik tombol tab <kbd>Sekarang</kbd> guna meninjau aplikasi yang sedang aktif menyedot bandwidth saat ini.
+3. Klik tombol tab <kbd>Total</kbd> guna memantau aplikasi mana yang paling boros kuota sepanjang sesi berlangsung.
+4. Centang opsi <kbd>Buka saat login</kbd> agar Cepaty menyala otomatis saat Mac pertama kali dinyalakan.
+5. Tekan pintasan <kbd>COMMAND (⌘)</kbd> + <kbd>Q</kbd> atau klik tombol **Keluar** di bagian bawah popover untuk menutup aplikasi.
+
+## Arsitektur & Cara Kerja
+
+Cepaty memadukan utilitas diagnosa bawaan macOS dengan kalkulasi delta yang efisien.
+
+```text
                   ┌────────────────────────┐
-                  │    macOS Network      │
+                  │    macOS Network       │
                   │   (/usr/bin/nettop)    │
                   └───────────┬────────────┘
                               │ Snapshot 25ms (-L 1)
@@ -56,108 +110,93 @@ Cepaty dirancang dengan fokus pada efisiensi baterai dan akurasi data.
      └─────────────────┘             └─────────────────┘
 ```
 
-### Mengapa Menggunakan Snapshot Diskrit?
+### Snapshot Diskrit Hemat Daya
 
-Utilitas bawaan `nettop` pada macOS versi terbaru memiliki *issue* berupa *spin loop* konsumsi CPU tinggi jika dijalankan dalam mode streaming terus-menerus (`-L 0`).
+Mode streaming bawaan `nettop` (`-L 0`) pada versi macOS modern kerap memicu *spin loop* yang memakan CPU hingga puluhan persen.
 
-Cepaty menyelesaikan kendala ini dengan pendekatan **periodic snapshot**:
-1. Menjalankan `nettop -P -n -x -L 1 -J bytes_in,bytes_out` setiap interval waktu (5 detik saat ditutup, 1 detik saat popover dibuka).
-2. Setiap proses snapshot hanya membutuhkan waktu eksekusi sekitar 25 milidetik di latar belakang, lalu proses tersebut langsung selesai.
-3. Selisih byte (delta) dan laju per detik dihitung langsung oleh [TrafficAggregator.swift](Sources/Cepaty/Core/TrafficAggregator.swift).
-4. Hasilnya, CPU Mac tetap dingin, hemat baterai, dan bebas dari proses *hanging*.
+Cepaty mengatasi kendala ini lewat pendekatan **periodic snapshot**:
+1. Menjalankan `nettop -P -n -x -L 1 -J bytes_in,bytes_out` setiap interval (5 detik saat di latar belakang, 1 detik saat popover dibuka).
+2. Perintah hanya berjalan sekitar 25 milidetik untuk membaca snapshot socket kernel, lalu proses langsung berakhir.
+3. [TrafficAggregator.swift](Sources/Cepaty/Core/TrafficAggregator.swift) menghitung selisih byte kumulatif antar snapshot secara mandiri.
+4. Baterai laptop Anda tetap awet dan CPU tidak terbebani.
 
----
+### Pengelompokan Sub-proses
 
-## Persyaratan Sistem
+Aplikasi modern seperti browser web atau aplikasi chat sering memecah koneksi ke banyak proses helper. [AppResolver.swift](Sources/Cepaty/Core/AppResolver.swift) mengenali pola `.helper`, `.renderer`, dan `.service` untuk menyatukan seluruh koneksi anak ke dalam ikon dan nama aplikasi induk yang rapi.
 
-- macOS 13.0 (Ventura) atau versi lebih baru (Sonoma, Sequoia, dsb).
-- Mendukung arsitektur Apple Silicon (M1/M2/M3/M4) dan Intel (x86_64).
+## Tanya Jawab (FAQ)
 
----
+### Apakah Cepaty membutuhkan izin root atau sudo?
+Tidak. Cepaty memanfaatkan perintah diagnostik `nettop` pengguna standar. Seluruh proses yang dimiliki oleh akun pengguna dapat dipantau tanpa harus membuka akses root.
 
-## Instalasi
+### Mengapa proses Chrome Helper dan Slack Renderer digabung?
+Banyak aplikasi modern membagi tab atau fungsi rendering ke dalam proses terpisah. Jika tidak digabungkan, daftar popover akan penuh dengan baris proses teknis yang membingungkan. Cepaty menggabungkannya ke aplikasi utama agar informasi tetap informatif dan mudah dibaca.
 
-### 1. Unduh DMG (Praktis)
+### Bagaimana Cepaty menjaga penggunaan CPU tetap 0.0%?
+Dengan tidak membiarkan `nettop` terus-menerus berjalan di latar belakang. Cepaty hanya membangunkannya sekejap selama 25 milidetik setiap beberapa detik sekali. Di antara jeda tersebut, aplikasi murni tertidur (*idle sleep*).
 
-1. Buka halaman [Releases](https://github.com/januarsyah901/cepaty/releases).
-2. Unduh berkas `Cepaty-1.0.0.dmg`.
-3. Buka DMG dan seret `Cepaty.app` ke folder `Applications`.
-4. Jalankan aplikasi dari Launchpad atau Spotlight.
+### Bagaimana cara menyalakan fitur buka saat login?
+Cukup centang kotak pilihan **Buka saat login** pada jendela popover. Cepaty memakai API resmi macOS `SMAppService` sehingga Anda bisa mengelolanya langsung lewat System Settings Mac.
 
-### 2. Kompilasi dari Source
+## Pengujian Unit
 
-Pastikan Xcode Command Line Tools sudah terpasang di Mac:
+Cepaty menyertakan suite pengujian unit mandiri tanpa ketergantungan framework pengujian luar:
 
-```bash
-# Clone repositori
-git clone https://github.com/januarsyah901/cepaty.git
-cd cepaty
-
-# Jalankan pengujian unit
+```sh
 ./build.sh test
-
-# Bangun aplikasi dan buat paket installer DMG
-./package_app.sh
 ```
 
-Aplikasi `Cepaty.app` akan otomatis dikompilasi, diberi signature ad-hoc, dan dipasang langsung ke `/Applications`.
-
----
+Hal-hal yang diuji mencakup:
+* Parser nama proses dengan titik dan spasi (`Google.Chrome Helper`).
+* Penolakan baris CSV yang rusak atau tidak lengkap.
+* Pencegahan lonjakan kuota pada tick pembuka sesi.
+* Pembersihan angka kecepatan saat aplikasi berhenti menggunakan jaringan.
+* Ketepatan algoritma pengurutan data popover.
 
 ## Struktur Berkas
 
 ```text
 cepaty/
-├── Package.swift               # Definisi Swift Package
+├── Package.swift               # Konfigurasi Swift Package
 ├── build.sh                    # Skrip kompilasi dan runner unit test
-├── package_app.sh              # Skrip pembuat bundle .app dan .dmg
-├── AppIcon.icns                # Ikon aplikasi resolusi tinggi
+├── package_app.sh              # Skrip bundle macOS .app dan .dmg
+├── AppIcon.icns                # Asset ikon macOS multi-resolusi
+├── assets/
+│   └── logo.png                # Asset logo display untuk dokumentasi
 ├── Sources/
 │   └── Cepaty/
-│       ├── CepatyApp.swift     # Titik masuk SwiftUI MenuBarExtra
+│       ├── CepatyApp.swift     # Titik masuk aplikasi MenuBarExtra
 │       ├── Core/
-│       │   ├── AppResolver.swift       # Pemetaan PID & icon aplikasi
-│       │   ├── NettopParser.swift      # Parser output CSV nettop
-│       │   ├── NettopSampler.swift     # Timer eksekusi snapshot nettop
-│       │   ├── TrafficAggregator.swift # Kalkulator delta & agregasi data
-│       │   └── TrafficModels.swift     # Struktur data model
+│       │   ├── AppResolver.swift       # Resolusi nama dan bundle app
+│       │   ├── NettopParser.swift      # Parser data CSV
+│       │   ├── NettopSampler.swift     # Timer snapshot latar belakang
+│       │   ├── TrafficAggregator.swift # Penghitung delta kecepatan
+│       │   └── TrafficModels.swift     # Definisi tipe data
 │       ├── ViewModels/
-│       │   └── TrafficViewModel.swift  # Pengelola status tampilan
+│       │   └── TrafficViewModel.swift  # ObservableObject antarmuka
 │       ├── Views/
-│       │   ├── AppRow.swift            # Baris data per aplikasi
-│       │   ├── MenuBarLabel.swift      # Label kecepatan di status bar
+│       │   ├── AppRow.swift            # Tampilan baris tiap aplikasi
+│       │   ├── MenuBarLabel.swift      # Label teks pada menu bar
 │       │   └── TrafficPopover.swift    # Jendela popover utama
 │       └── Utils/
-│           ├── ByteFormatter.swift     # Format satuan B, KB, MB, GB
-│           └── LaunchAtLogin.swift     # Pengaturan login service
-├── Tests/
-│   └── CepatyTests/
-│       ├── Main.swift          # Runner pengujian unit
-│       └── TrafficTests.swift  # Kumpulan skenario unit test
-└── .github/
-    └── workflows/
-        └── ci.yml              # CI workflow GitHub Actions
+│           ├── ByteFormatter.swift     # Pemformat teks byte dan laju
+│           └── LaunchAtLogin.swift     # Pengatur service saat login
+└── Tests/
+    └── CepatyTests/
+        ├── Main.swift          # Titik masuk runner test
+        └── TrafficTests.swift  # Kumpulan kasus pengujian
 ```
 
----
+## Dukungan (Sponsor)
 
-## Pengujian Unit
+Jika Cepaty bermanfaat untuk aktivitas harian Anda, Anda bisa mendukung pengembangan proyek ini dengan mentraktir kopi lewat Saweria:
 
-Cepaty dilengkapi dengan rangkaian unit test independen tanpa ketergantungan framework eksternal:
+<a href="https://saweria.co/januarsyah" target="_blank">
+  <img src="https://img.shields.io/badge/Dukung%20di-Saweria-E8971E?style=for-the-badge&logo=coffee&logoColor=white" alt="Dukung di Saweria" />
+</a>
 
-```bash
-./build.sh test
-```
-
-Rangkaian pengujian mencakup:
-- Validasi parser nama proses dengan spasi dan tanda titik.
-- Penanganan baris rusak atau format tidak valid.
-- Verifikasi proteksi baseline awal dan kalkulasi delta.
-- Pembersihan nilai kecepatan saat proses berhenti beraktivitas.
-- Logika pengurutan data (kecepatan saat ini vs total sesi).
-
----
+Setiap dukungan sangat berarti untuk pemeliharaan aplikasi dan pembaruan fitur ke depan.
 
 ## Lisensi
 
-Proyek ini dilisensikan di bawah ketentuan [MIT License](LICENSE).
+Proyek ini dilindungi oleh lisensi terbuka [MIT License](LICENSE).
