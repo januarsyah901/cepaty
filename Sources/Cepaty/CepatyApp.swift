@@ -1,20 +1,28 @@
 import AppKit
-import SwiftUI
 
-@main
-struct CepatyApp: App {
-    @StateObject private var model = TrafficViewModel()
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    private let model = TrafficViewModel()
+    private var controller: StatusItemController?
 
-    init() {
-        NSApplication.shared.setActivationPolicy(.accessory)
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.setActivationPolicy(.accessory)   // menu bar only, no Dock icon
+        controller = StatusItemController(model: model)
+        model.start()
     }
 
-    var body: some Scene {
-        MenuBarExtra {
-            TrafficPopover(model: model)
-        } label: {
-            MenuBarLabel(apps: model.apps)
-        }
-        .menuBarExtraStyle(.window)
+    func applicationWillTerminate(_ notification: Notification) {
+        model.stop()   // makes sure the nettop child process goes away
+    }
+}
+
+@main
+struct CepatyApp {
+    @MainActor
+    static func main() {
+        let app = NSApplication.shared
+        let delegate = AppDelegate()
+        app.delegate = delegate
+        app.run()
     }
 }

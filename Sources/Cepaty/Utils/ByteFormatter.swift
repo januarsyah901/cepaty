@@ -25,4 +25,9 @@ enum ByteFormatter {
             return String(format: "%.0f %@", bytes, units[index])
         }
     }
+
+    /// 0...1 on a log scale (1 B/s -> 0, 100 MB/s -> 1). Drives the mini level bars.
+    static func level(_ bytesPerSecond: Double) -> Double {
+        min(1, max(0, log10(max(bytesPerSecond, 1)) / 8))
+    }
 }

@@ -45,6 +45,7 @@ struct TestRunner {
         print("\n[ByteFormatter Tests]")
         testByteFormatterSpeed()
         testByteFormatterAmount()
+        testByteFormatterLevel()
 
         print("\n[TrafficAggregator Tests]")
         testAggregatorBaselineAndSecondTick()
@@ -93,6 +94,11 @@ struct TestRunner {
         assertEqual(ByteFormatter.speed(500), "500 B/s", "Format 500 B/s")
         assertEqual(ByteFormatter.speed(1536), "1.5 KB/s", "Format 1.5 KB/s")
         assertEqual(ByteFormatter.speed(10485760), "10 MB/s", "Format 10 MB/s")
+    }
+
+    private static func testByteFormatterLevel() {
+        assertEqual(ByteFormatter.level(0), 0.0, "Level of 0 B/s is 0")
+        assertEqual(ByteFormatter.level(1e12), 1.0, "Level is clamped to 1")
     }
 
     private static func testByteFormatterAmount() {

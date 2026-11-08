@@ -26,3 +26,11 @@ struct AppTraffic: Identifiable {
     var currentUsage: Double { downSpeed + upSpeed }
     var sessionUsage: UInt64 { totalIn + totalOut }
 }
+
+/// One point of the throughput history (already smoothed).
+struct NetworkSample: Identifiable, Equatable {
+    let id = UUID()
+    let time: Date
+    let down: Double   // bytes/s
+    let up: Double     // bytes/s
+}
