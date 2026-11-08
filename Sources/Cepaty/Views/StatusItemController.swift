@@ -13,6 +13,9 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private var loginItem: NSMenuItem?
     private var cancellable: AnyCancellable?
     private var lastRendered = ""
+    private var shownDown = 0.0
+    private var shownUp = 0.0
+    private var lastRenderTime = Date.distantPast
 
     init(model: TrafficViewModel) {
         self.model = model
@@ -34,23 +37,33 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
     // MARK: Meter
 
-    /// Rendering the widget to a plain image is far cheaper than hosting a live SwiftUI
-    /// view inside the status button: macOS re-lays-out hosted views on every change.
+    /// Every status item update costs ~0.5% CPU (AppKit draws the button twice and updates
+    /// the status item scene), so while the menu is closed the widget is redrawn only when a
+    /// value moved noticeably, or at least every `maxStaleness` seconds. With the menu open
+    /// it follows every tick.
+    private static let maxStaleness: TimeInterval = 3
+    private static let significantChange = 0.15
+
+    private func isSignificant(_ new: Double, _ old: Double) -> Bool {
+        abs(new - old) > Self.significantChange * max(new, old) + 512   // 512 B/s noise floor
+    }
+
     private func renderMeter() {
         guard let button = statusItem.button else { return }
-        let isDark = button.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-        let key = "\(ByteFormatter.speed(model.down))|\(ByteFormatter.speed(model.up))|\(Int(ByteFormatter.level(model.down) * 20))|\(Int(ByteFormatter.level(model.up) * 20))|\(isDark)"
+        let now = Date()
+        let due = model.menuOpen
+            || now.timeIntervalSince(lastRenderTime) >= Self.maxStaleness
+            || isSignificant(model.down, shownDown)
+            || isSignificant(model.up, shownUp)
+        guard due else { return }
+
+        let key = "\(ByteFormatter.speed(model.down))|\(ByteFormatter.speed(model.up))|\(Int(ByteFormatter.level(model.down) * 20))|\(Int(ByteFormatter.level(model.up) * 20))"
         guard key != lastRendered else { return }   // nothing visible changed
         lastRendered = key
-
-        let renderer = ImageRenderer(content:
-            MeterView(down: model.down, up: model.up)
-                .environment(\.colorScheme, isDark ? .dark : .light))
-        renderer.scale = button.window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2
-        if let image = renderer.nsImage {
-            image.isTemplate = false
-            button.image = image
-        }
+        shownDown = model.down
+        shownUp = model.up
+        lastRenderTime = now
+        button.image = MeterImage.make(down: model.down, up: model.up)
     }
 
     // MARK: Menu

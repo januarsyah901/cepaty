@@ -37,7 +37,7 @@ Cepaty berjalan pada macOS Ventura 13 atau versi lebih baru (Apple Silicon & Int
 
 ## Fitur
 
-* ⚡ **Ringan dan Cepat**: CPU rendah di latar belakang (sekitar 1–3% pada pengukuran terakhir, lihat FAQ), memori sekitar 20 MB.
+* ⚡ **Ringan dan Cepat**: CPU rendah di latar belakang (sekitar 1–2,5% pada pengukuran terakhir, lihat FAQ), memori sekitar 20 MB.
 * 📊 **Live Speed Monospaced**: Angka download dan upload (`↓ …  ↑ …`) di status bar tidak bergetar saat digit berubah.
 * 🧩 **Per-App Traffic**: Menampilkan daftar aplikasi yang memakai kuota lengkap dengan ikon asli macOS.
 * 🗂️ **Dua Mode Urutan**: Beralih instan antara kecepatan aktif (**Sekarang**) dan total kuota (**Total**).
@@ -115,7 +115,7 @@ Cepaty memadukan utilitas diagnosa bawaan macOS dengan kalkulasi delta yang efis
 Mode streaming bawaan `nettop` (`-L 0`) pada versi macOS modern kerap memicu *spin loop* yang memakan CPU hingga puluhan persen.
 
 Cepaty mengatasi kendala ini lewat pendekatan **periodic snapshot**:
-1. Menjalankan `nettop -P -n -x -L 1 -J bytes_in,bytes_out` setiap interval (5 detik saat di latar belakang, 1 detik saat popover dibuka).
+1. Menjalankan `nettop -P -n -x -L 1 -J bytes_in,bytes_out` setiap interval (10 detik saat menu tertutup, 1 detik saat menu dibuka).
 2. Perintah hanya berjalan sekitar 25 milidetik untuk membaca snapshot socket kernel, lalu proses langsung berakhir.
 3. [TrafficAggregator.swift](Sources/Cepaty/Core/TrafficAggregator.swift) menghitung selisih byte kumulatif antar snapshot secara mandiri.
 4. Baterai laptop Anda tetap awet dan CPU tidak terbebani.
@@ -133,7 +133,7 @@ Tidak. Cepaty memanfaatkan perintah diagnostik `nettop` pengguna standar. Seluru
 Banyak aplikasi modern membagi tab atau fungsi rendering ke dalam proses terpisah. Jika tidak digabungkan, daftar popover akan penuh dengan baris proses teknis yang membingungkan. Cepaty menggabungkannya ke aplikasi utama agar informasi tetap informatif dan mudah dibaca.
 
 ### Bagaimana Cepaty menjaga penggunaan CPU tetap rendah?
-Dengan tidak membiarkan `nettop` terus-menerus berjalan di latar belakang. Cepaty hanya membangunkannya sekejap selama 25 milidetik setiap beberapa detik sekali. Di antara jeda tersebut, sampler tertidur. Angka kecepatan di menu bar diperbarui tiap detik dari counter interface (`getifaddrs`), dan grafik di dropdown hanya bergerak saat menu terbuka. Pada pengukuran terakhir (menu tertutup) pemakaian CPU sekitar 1–3%, dan sekitar 15% saat menu terbuka.
+Dengan tidak membiarkan `nettop` terus-menerus berjalan di latar belakang. Cepaty hanya membangunkannya sekejap selama 25 milidetik setiap beberapa detik sekali. Di antara jeda tersebut, sampler tertidur. Angka kecepatan di menu bar dihitung tiap detik dari counter interface (`getifaddrs`), tetapi widget hanya digambar ulang saat angkanya berubah cukup berarti (atau maksimal 3 detik sekali), karena setiap update status item di macOS memakan CPU, dan grafik di dropdown hanya bergerak saat menu terbuka. Pada pengukuran terakhir (menu tertutup) pemakaian CPU sekitar 1–2,5% (tergantung lalu lintas jaringan), dan sekitar 15% saat menu terbuka.
 
 ### Bagaimana cara menyalakan fitur buka saat login?
 Cukup pilih **Buka saat login** pada menu Cepaty. Cepaty memakai API resmi macOS `SMAppService` sehingga Anda bisa mengelolanya langsung lewat System Settings Mac.

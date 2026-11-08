@@ -24,7 +24,10 @@ final class TrafficViewModel: ObservableObject {
 
     private let sampler = NettopSampler()
     private let aggregator = TrafficAggregator()
-    private var currentInterval = 5
+    /// Closed-menu interval. Per-app totals come from cumulative counters, so a longer
+    /// interval loses no bytes (only processes that start and exit between samples).
+    private static let idleInterval = 10
+    private var currentInterval = idleInterval
     private var interfaceTimer: Timer?
     private var lastCounters: [String: InterfaceReader.Counters] = [:]
     private var lastTick: Date?
@@ -46,7 +49,7 @@ final class TrafficViewModel: ObservableObject {
     /// While the menu is open: per-app data every second. Closed: every 5 s (cheap).
     func setMenuOpen(_ open: Bool) {
         menuOpen = open
-        let next = open ? 1 : 5
+        let next = open ? 1 : Self.idleInterval
         guard next != currentInterval else { return }
         currentInterval = next
         sampler.start(interval: next)
@@ -65,6 +68,7 @@ final class TrafficViewModel: ObservableObject {
     private func startInterfaceTimer() {
         interfaceTimer?.invalidate()
         let timer = Timer(timeInterval: 1.0, repeats: true) { [weak self] _ in self?.tick() }
+        timer.tolerance = 0.2   // lets the system coalesce wakeups
         RunLoop.main.add(timer, forMode: .common)   // .common keeps firing while a menu is open
         interfaceTimer = timer
         tick()
