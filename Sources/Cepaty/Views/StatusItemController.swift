@@ -1,11 +1,6 @@
 import AppKit
+import Combine
 import SwiftUI
-
-/// Hosting view that lets clicks fall through to the NSStatusBarButton underneath,
-/// otherwise the menu would never open when clicking on the widget.
-final class PassthroughHostingView<Content: View>: NSHostingView<Content> {
-    override func hitTest(_ point: NSPoint) -> NSView? { nil }
-}
 
 /// NSStatusItem (live SwiftUI meter) + native NSMenu (SwiftUI only for graph and list).
 /// Native menu = real highlight, keyboard navigation, correct dark/light behaviour.
@@ -16,6 +11,8 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private let menu = NSMenu()
     private var sortItems: [NSMenuItem] = []
     private var loginItem: NSMenuItem?
+    private var cancellable: AnyCancellable?
+    private var lastRendered = ""
 
     init(model: TrafficViewModel) {
         self.model = model
@@ -23,18 +20,37 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         self.statusItem = NSStatusBar.system.statusItem(withLength: Theme.statusWidth)
         super.init()
 
-        if let button = statusItem.button {
-            let host = PassthroughHostingView(rootView: MeterView(model: model))
-            host.frame = button.bounds
-            host.autoresizingMask = [.width, .height]
-            button.addSubview(host)
-            button.setAccessibilityLabel("Lalu lintas jaringan")
-        }
+        statusItem.button?.imagePosition = .imageOnly
+        statusItem.button?.setAccessibilityLabel("Lalu lintas jaringan")
+        renderMeter()
+        // The history grows once per second, right after down/up are updated.
+        cancellable = model.$history.sink { [weak self] _ in self?.renderMeter() }
 
         menu.delegate = self
         menu.autoenablesItems = false
         buildMenu()
         statusItem.menu = menu
+    }
+
+    // MARK: Meter
+
+    /// Rendering the widget to a plain image is far cheaper than hosting a live SwiftUI
+    /// view inside the status button: macOS re-lays-out hosted views on every change.
+    private func renderMeter() {
+        guard let button = statusItem.button else { return }
+        let isDark = button.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        let key = "\(ByteFormatter.speed(model.down))|\(ByteFormatter.speed(model.up))|\(Int(ByteFormatter.level(model.down) * 20))|\(Int(ByteFormatter.level(model.up) * 20))|\(isDark)"
+        guard key != lastRendered else { return }   // nothing visible changed
+        lastRendered = key
+
+        let renderer = ImageRenderer(content:
+            MeterView(down: model.down, up: model.up)
+                .environment(\.colorScheme, isDark ? .dark : .light))
+        renderer.scale = button.window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2
+        if let image = renderer.nsImage {
+            image.isTemplate = false
+            button.image = image
+        }
     }
 
     // MARK: Menu

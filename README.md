@@ -37,7 +37,7 @@ Cepaty berjalan pada macOS Ventura 13 atau versi lebih baru (Apple Silicon & Int
 
 ## Fitur
 
-* ⚡ **Ringan dan Cepat**: CPU rendah di latar belakang (beberapa persen pada pengukuran terakhir, lihat FAQ), memori sekitar 20 MB.
+* ⚡ **Ringan dan Cepat**: CPU rendah di latar belakang (sekitar 1–3% pada pengukuran terakhir, lihat FAQ), memori sekitar 20 MB.
 * 📊 **Live Speed Monospaced**: Angka download dan upload (`↓ …  ↑ …`) di status bar tidak bergetar saat digit berubah.
 * 🧩 **Per-App Traffic**: Menampilkan daftar aplikasi yang memakai kuota lengkap dengan ikon asli macOS.
 * 🗂️ **Dua Mode Urutan**: Beralih instan antara kecepatan aktif (**Sekarang**) dan total kuota (**Total**).
@@ -133,7 +133,7 @@ Tidak. Cepaty memanfaatkan perintah diagnostik `nettop` pengguna standar. Seluru
 Banyak aplikasi modern membagi tab atau fungsi rendering ke dalam proses terpisah. Jika tidak digabungkan, daftar popover akan penuh dengan baris proses teknis yang membingungkan. Cepaty menggabungkannya ke aplikasi utama agar informasi tetap informatif dan mudah dibaca.
 
 ### Bagaimana Cepaty menjaga penggunaan CPU tetap rendah?
-Dengan tidak membiarkan `nettop` terus-menerus berjalan di latar belakang. Cepaty hanya membangunkannya sekejap selama 25 milidetik setiap beberapa detik sekali. Di antara jeda tersebut, sampler tertidur. Angka kecepatan di menu bar diperbarui tiap detik dari counter interface (`getifaddrs`), dan grafik di dropdown hanya bergerak saat menu terbuka. Pada pengukuran terakhir (menu tertutup) pemakaian CPU sekitar 3–4%, dan sekitar 15% saat menu terbuka.
+Dengan tidak membiarkan `nettop` terus-menerus berjalan di latar belakang. Cepaty hanya membangunkannya sekejap selama 25 milidetik setiap beberapa detik sekali. Di antara jeda tersebut, sampler tertidur. Angka kecepatan di menu bar diperbarui tiap detik dari counter interface (`getifaddrs`), dan grafik di dropdown hanya bergerak saat menu terbuka. Pada pengukuran terakhir (menu tertutup) pemakaian CPU sekitar 1–3%, dan sekitar 15% saat menu terbuka.
 
 ### Bagaimana cara menyalakan fitur buka saat login?
 Cukup pilih **Buka saat login** pada menu Cepaty. Cepaty memakai API resmi macOS `SMAppService` sehingga Anda bisa mengelolanya langsung lewat System Settings Mac.

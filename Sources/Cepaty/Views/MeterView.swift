@@ -1,18 +1,19 @@
 import SwiftUI
 
-/// The live widget drawn INSIDE the status item: two mini level bars + two rate lines.
+/// The live widget shown in the status item (rendered to an image once per second): two mini level bars + two rate lines.
 struct MeterView: View {
-    @ObservedObject var model: TrafficViewModel
+    let down: Double
+    let up: Double
 
     var body: some View {
         HStack(spacing: 5) {
             HStack(spacing: 2) {
-                MiniBar(level: ByteFormatter.level(model.up), tint: Theme.upload)
-                MiniBar(level: ByteFormatter.level(model.down), tint: Theme.download)
+                MiniBar(level: ByteFormatter.level(up), tint: Theme.upload)
+                MiniBar(level: ByteFormatter.level(down), tint: Theme.download)
             }
             VStack(alignment: .trailing, spacing: 0) {
-                rate("arrow.up", model.up)
-                rate("arrow.down", model.down)
+                rate("arrow.up", up)
+                rate("arrow.down", down)
             }
         }
         .padding(.horizontal, 4)
