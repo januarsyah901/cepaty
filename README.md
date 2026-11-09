@@ -50,7 +50,7 @@ Cepaty berjalan pada macOS Ventura 13 atau versi lebih baru (Apple Silicon & Int
 ### Unduh Installer DMG
 
 1. Unduh berkas installer terbaru dari halaman [Releases](https://github.com/januarsyah901/cepaty/releases/latest).
-2. Buka berkas `Cepaty-1.0.0.dmg`.
+2. Buka berkas `Cepaty-1.1.0.dmg`.
 3. Tarik ikon `Cepaty.app` ke dalam pintasan folder `Applications`.
 4. Buka Cepaty lewat Spotlight atau Launchpad.
 

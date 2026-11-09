@@ -48,7 +48,7 @@ cat << 'EOF' > "${CONTENTS_DIR}/Info.plist"
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.0</string>
+    <string>1.1.0</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>LSMinimumSystemVersion</key>
@@ -65,7 +65,7 @@ echo "=== Memberi kode signing ad-hoc ==="
 codesign --force --deep --sign - "${APP_DIR}"
 
 echo "=== Membuat DMG Installer ==="
-hdiutil create -volname "${APP_NAME}" -srcfolder "${APP_DIR}" -ov -format UDZO "${APP_NAME}-1.0.0.dmg"
+hdiutil create -volname "${APP_NAME}" -srcfolder "${APP_DIR}" -ov -format UDZO "${APP_NAME}-1.1.0.dmg"
 
 # Install locally only if /Applications is writable and running locally
 if [ -w "/Applications" ] && [ -z "$CI" ]; then
@@ -74,5 +74,5 @@ if [ -w "/Applications" ] && [ -z "$CI" ]; then
     cp -R "${APP_DIR}" "/Applications/${APP_DIR}"
     echo "Selesai! ${APP_NAME}.app terpasang di /Applications/${APP_DIR}"
 else
-    echo "Selesai! Paket ${APP_NAME}.app dan ${APP_NAME}-1.0.0.dmg siap dipakai."
+    echo "Selesai! Paket ${APP_NAME}.app dan ${APP_NAME}-1.1.0.dmg siap dipakai."
 fi
