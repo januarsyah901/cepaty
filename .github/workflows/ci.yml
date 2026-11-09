@@ -9,14 +9,11 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
 
       - name: Show Swift & macOS Environment
         run: |
@@ -34,5 +31,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Cepaty-Installer
-          path: Cepaty-1.0.0.dmg
+          path: Cepaty-1.1.0.dmg
           if-no-files-found: error
